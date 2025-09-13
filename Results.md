@@ -6,6 +6,36 @@ This document summarizes the evaluation results of different models on the emoti
 - Validation set size: 800 samples
 - 8 emotion classes: Neutral, Happy, Sad, Surprise, Fear, Disgust, Anger, Contempt
 
+## ResNet18 Results
+
+### Classification Performance
+
+```
+              precision    recall  f1-score   support
+
+     Neutral     0.4444    0.4000    0.4211       100
+       Happy     0.6275    0.6400    0.6337       100
+         Sad     0.5581    0.4800    0.5161       100
+    Surprise     0.4953    0.5300    0.5121       100
+        Fear     0.5268    0.5900    0.5566       100
+     Disgust     0.4732    0.5300    0.5000       100
+       Anger     0.4574    0.4300    0.4433       100
+    Contempt     0.4227    0.4100    0.4162       100
+
+    accuracy                         0.5012       800
+   macro avg     0.5007    0.5012    0.4999       800
+weighted avg     0.5007    0.5012    0.4999       800
+```
+
+### Summary Metrics
+- Overall Accuracy: **0.5012**
+- Macro F1-score: **0.4999**
+- Cohen's Kappa: **0.4300**
+- ROC-AUC (macro): **0.8229**
+- PR-AUC (macro): **0.4871**
+- Valence RMSE: **0.3867**, MAE: **0.2982**
+- Arousal RMSE: **0.3283**, MAE: **0.2562**
+
 ## ResNet34 Results
 
 ### Classification Performance
@@ -64,7 +94,8 @@ weighted avg     0.4952    0.4863    0.4837       800
 
 | Model | Accuracy | F1-score | Valence RMSE | Arousal RMSE |
 |-------|----------|----------|--------------|--------------|
+| ResNet18 | 0.5012 | 0.4999 | 0.3867 | 0.3283 |
 | ResNet34 | 0.4825 | 0.4692 | 0.3885 | 0.3341 |
 | EfficientNet-B0 | 0.4863 | 0.4837 | 0.3962 | 0.3487 |
 
-EfficientNet-B0 shows a slight improvement in classification accuracy and F1-score over ResNet34, while ResNet34 performs slightly better on the regression metrics (Valence and Arousal).
+ResNet18 shows the best overall performance among the three models, with the highest accuracy (0.5012) and F1-score (0.4999). It also performs best on the regression metrics with the lowest Valence RMSE (0.3867) and Arousal RMSE (0.3283).
