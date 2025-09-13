@@ -5,11 +5,9 @@ from torchvision import models
 from torch.utils.data import DataLoader
 from FER_transform import FERDataset
 import numpy as np
-from torch.cuda.amp import autocast, GradScaler
+from torch.amp import autocast, GradScaler
 
-# ======================
 # 1. Config
-# ======================
 BATCH_SIZE = 16
 EPOCHS = 50
 LR = 3e-4
@@ -18,18 +16,14 @@ PATIENCE = 7
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print("Using device:", DEVICE)
 
-# ======================
 # 2. Data
-# ======================
 train_ds = FERDataset("metadata_train.parquet", train=True)
 val_ds   = FERDataset("metadata_val.parquet", train=False)
 
 train_dl = DataLoader(train_ds, batch_size=BATCH_SIZE, shuffle=True, num_workers=0)
 val_dl   = DataLoader(val_ds, batch_size=BATCH_SIZE, shuffle=False, num_workers=0)
 
-# ======================
 # 3. Model (ResNet34)
-# ======================
 class FERResNet34(nn.Module):
     def __init__(self):
         super().__init__()
@@ -45,10 +39,7 @@ class FERResNet34(nn.Module):
 
 model = FERResNet34().to(DEVICE)
 
-# ======================
 # 4. Loss & Optimizer
-# ======================
-# Class weights (handle imbalance)
 cls_counts = np.bincount(train_ds.df["expression"].astype(int), minlength=8)
 cls_weights = torch.tensor(1.0 / (cls_counts + 1e-6), dtype=torch.float32)
 cls_weights = (cls_weights / cls_weights.sum() * 8).to(DEVICE)
@@ -59,11 +50,9 @@ criterion_reg = nn.MSELoss()
 optimizer = optim.AdamW(model.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
 scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=EPOCHS)
 
-scaler = GradScaler()
+scaler = GradScaler(enabled=(DEVICE.type == "cuda"))
 
-# ======================
 # 5. Training loop
-# ======================
 best_val_acc = 0.0
 bad_epochs = 0
 
@@ -76,7 +65,7 @@ for epoch in range(EPOCHS):
         imgs, y_cls, y_reg = batch["image"].to(DEVICE), batch["y_cls"].to(DEVICE), batch["y_reg"].to(DEVICE)
         optimizer.zero_grad(set_to_none=True)
 
-        with autocast(enabled=DEVICE.type == "cuda"):
+        with autocast("cuda", enabled=(DEVICE.type == "cuda")):
             out_cls, out_reg = model(imgs)
             loss_cls = criterion_cls(out_cls, y_cls)
             loss_reg = criterion_reg(out_reg, y_reg)
