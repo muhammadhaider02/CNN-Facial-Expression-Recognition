@@ -44,7 +44,6 @@ def build():
             r = f.result()
             if r is not None:
                 rows.append(r)
-
             if i % 1000 == 0 or i == len(imgs):
                 print(f"[{i}/{len(imgs)}] images processed...")
 

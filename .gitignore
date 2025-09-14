@@ -5,3 +5,6 @@ __pycache__/
 *.pyd
 *.parquet
 .DS_Store
+
+images_aug/
+annotations_aug/
