@@ -22,22 +22,24 @@ CLASS_NAMES = ["Neutral","Happy","Sad","Surprise","Fear","Disgust","Anger","Cont
 val_ds = FERDataset("metadata_val.parquet", train=False)
 val_dl = DataLoader(val_ds, batch_size=BATCH_SIZE, shuffle=False, num_workers=0)
 
-# 3. Model (ResNet18)
-class FERResNet18(nn.Module):
+# 3. Model (ResNet50)
+class FERResNet50(nn.Module):
     def __init__(self):
         super().__init__()
-        self.backbone = models.resnet18(weights=models.ResNet18_Weights.IMAGENET1K_V1)
+        self.backbone = models.resnet50(weights=models.ResNet50_Weights.IMAGENET1K_V1)
         in_features = self.backbone.fc.in_features
         self.backbone.fc = nn.Identity()  # type: ignore[assignment]
+        self.dropout = nn.Dropout(0.7)
         self.fc_cls = nn.Linear(in_features, 8)   # classification
         self.fc_reg = nn.Linear(in_features, 2)   # valence, arousal
 
     def forward(self, x):
         feats = self.backbone(x)
+        feats = self.dropout(feats)
         return self.fc_cls(feats), self.fc_reg(feats)
 
-model = FERResNet18().to(DEVICE)
-state_dict = torch.load("FER_resnet18.pth", map_location=DEVICE, weights_only=True)
+model = FERResNet50().to(DEVICE)
+state_dict = torch.load("FER_resnet50.pth", map_location=DEVICE, weights_only=True)
 model.load_state_dict(state_dict)
 model.eval()
 
@@ -103,9 +105,9 @@ plt.figure(figsize=(8,6))
 sns.heatmap(cm, annot=True, fmt="d", xticklabels=CLASS_NAMES, yticklabels=CLASS_NAMES, cmap="Blues")
 plt.xlabel("Predicted")
 plt.ylabel("True")
-plt.title("ResNet18 Confusion Matrix (Validation)")
+plt.title("ResNet50 Confusion Matrix (Validation)")
 plt.tight_layout()
-plt.savefig("ConfusionMatrix_resnet18.png")
+plt.savefig("ConfusionMatrix_resnet50.png")
 plt.show()
 
 # Regression metrics
@@ -116,3 +118,5 @@ mae_aro = mean_absolute_error(y_arousal, y_arousal_pred)
 
 print(f"Valence RMSE: {rmse_val:.4f}, MAE: {mae_val:.4f}")
 print(f"Arousal RMSE: {rmse_aro:.4f}, MAE: {mae_aro:.4f}")
+
+

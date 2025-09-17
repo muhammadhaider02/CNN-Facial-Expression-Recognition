@@ -30,7 +30,7 @@ class FERResNet18(nn.Module):
         super().__init__()
         self.backbone = models.resnet18(weights=models.ResNet18_Weights.IMAGENET1K_V1)
         in_features = self.backbone.fc.in_features
-        self.backbone.fc = nn.Identity()
+        self.backbone.fc = nn.Identity()  # type: ignore[assignment]
         self.dropout = nn.Dropout(0.4)
         self.fc_cls = nn.Linear(in_features, 8)
         self.fc_reg = nn.Linear(in_features, 2)

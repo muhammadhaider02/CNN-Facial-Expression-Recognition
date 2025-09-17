@@ -8,3 +8,51 @@ __pycache__/
 
 images_aug/
 annotations_aug/
+
+# Python caches and build artifacts
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+dist/
+build/
+*.egg
+*.egg-info/
+htmlcov/
+.coverage
+.coverage.*
+
+# Virtual environments
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE/editor settings
+.vscode/
+.idea/
+*.code-workspace
+
+# OS files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Environment/config
+.env
+.env.*
+.python-version
+
+# Training outputs and artifacts
+runs/
+outputs/
+checkpoints/
+models/
+logs/
+log/
+*.log
+*.pth
+*.pt
+*.ckpt
+*.onnx
+ConfusionMatrix_*.png

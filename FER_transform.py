@@ -14,10 +14,38 @@ CLASS_NAMES = [
 def build_transforms(train=True, size=224):
     if train:
         return A.Compose([
-            # Albumentations on your setup expects size=(h, w)
-            A.RandomResizedCrop(size=(size, size), scale=(0.9, 1.0), ratio=(0.97, 1.03)),
+            # Cropping & flips
+            A.RandomResizedCrop(height=size, width=size, scale=(0.9, 1.0), ratio=(0.97, 1.03)),
             A.HorizontalFlip(p=0.5),
-            A.ColorJitter(brightness=0.08, contrast=0.08, saturation=0.04, hue=0.02, p=0.5),
+
+            # Color & lighting variation (mild)
+            A.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.05, hue=0.02, p=0.5),
+
+            # Geometric transform (with expanded Affine args)
+            A.Affine(
+                translate_percent=(0.0, 0.05),
+                scale=(0.95, 1.05),
+                rotate=(-10, 10),
+                cval=0,
+                mode=cv2.BORDER_REFLECT_101,
+                p=0.4
+            ),
+
+            A.CoarseDropout(
+                max_holes=2,
+                max_height=int(0.2 * size),
+                max_width=int(0.2 * size),
+                fill_value=0,
+                p=0.4
+            ),
+
+            # Noise & denoising / lighting normalization
+            A.ISONoise(color_shift=(0.01, 0.05), intensity=(0.1, 0.3), p=0.4),
+            A.MedianBlur(blur_limit=3, p=0.15),
+            A.GaussianBlur(blur_limit=(3, 5), p=0.4),
+            A.CLAHE(clip_limit=2.0, tile_grid_size=(8, 8), p=0.3),
+
+            # Normalize and to tensor (ImageNet stats)
             A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
             ToTensorV2(),
         ])
@@ -58,7 +86,7 @@ class FERDataset(Dataset):
 
 if __name__ == "__main__":
     BATCH_SIZE = 32
-    train_ds = FERDataset("metadata_train_aug.parquet", train=True)
+    train_ds = FERDataset("metadata_train.parquet", train=True)
     val_ds   = FERDataset("metadata_val.parquet", train=False)
 
     # On Windows, bumping workers can hang; if so, set to 0

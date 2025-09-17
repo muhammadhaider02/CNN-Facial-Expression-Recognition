@@ -29,7 +29,7 @@ class FERResNet34(nn.Module):
         super().__init__()
         self.backbone = models.resnet34(weights=models.ResNet34_Weights.IMAGENET1K_V1)
         in_features = self.backbone.fc.in_features
-        self.backbone.fc = nn.Identity()
+        self.backbone.fc = nn.Identity()  # type: ignore[assignment]
         self.fc_cls = nn.Linear(in_features, 8)  # 8 emotions
         self.fc_reg = nn.Linear(in_features, 2)  # valence, arousal
 

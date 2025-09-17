@@ -1,3 +1,4 @@
+import sys
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
@@ -11,7 +12,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from FER_transform import FERDataset
-from torchvision import models
+
+from pathlib import Path
+senet_path = Path(__file__).resolve().parent / "senet.pytorch"
+sys.path.append(str(senet_path))
+from hubconf import se_resnet50  # type: ignore
 
 # 1. Config
 BATCH_SIZE = 32
@@ -22,22 +27,26 @@ CLASS_NAMES = ["Neutral","Happy","Sad","Surprise","Fear","Disgust","Anger","Cont
 val_ds = FERDataset("metadata_val.parquet", train=False)
 val_dl = DataLoader(val_ds, batch_size=BATCH_SIZE, shuffle=False, num_workers=0)
 
-# 3. Model (ResNet18)
-class FERResNet18(nn.Module):
+# 3. Model (SENet50)
+class FERSENet50(nn.Module):
     def __init__(self):
         super().__init__()
-        self.backbone = models.resnet18(weights=models.ResNet18_Weights.IMAGENET1K_V1)
-        in_features = self.backbone.fc.in_features
-        self.backbone.fc = nn.Identity()  # type: ignore[assignment]
-        self.fc_cls = nn.Linear(in_features, 8)   # classification
-        self.fc_reg = nn.Linear(in_features, 2)   # valence, arousal
+        backbone = se_resnet50(pretrained=False)
+        in_features = backbone.fc.in_features
+        backbone.fc = nn.Identity()  # type: ignore[assignment]
+
+        self.backbone = backbone
+        self.dropout = nn.Dropout(0.7)
+        self.fc_cls = nn.Linear(in_features, 8)
+        self.fc_reg = nn.Linear(in_features, 2)
 
     def forward(self, x):
         feats = self.backbone(x)
+        feats = self.dropout(feats)
         return self.fc_cls(feats), self.fc_reg(feats)
 
-model = FERResNet18().to(DEVICE)
-state_dict = torch.load("FER_resnet18.pth", map_location=DEVICE, weights_only=True)
+model = FERSENet50().to(DEVICE)
+state_dict = torch.load("FER_senet50.pth", map_location=DEVICE, weights_only=True)
 model.load_state_dict(state_dict)
 model.eval()
 
@@ -103,9 +112,9 @@ plt.figure(figsize=(8,6))
 sns.heatmap(cm, annot=True, fmt="d", xticklabels=CLASS_NAMES, yticklabels=CLASS_NAMES, cmap="Blues")
 plt.xlabel("Predicted")
 plt.ylabel("True")
-plt.title("ResNet18 Confusion Matrix (Validation)")
+plt.title("SENet50 Confusion Matrix (Validation)")
 plt.tight_layout()
-plt.savefig("ConfusionMatrix_resnet18.png")
+plt.savefig("ConfusionMatrix_senet50.png")
 plt.show()
 
 # Regression metrics
@@ -116,3 +125,5 @@ mae_aro = mean_absolute_error(y_arousal, y_arousal_pred)
 
 print(f"Valence RMSE: {rmse_val:.4f}, MAE: {mae_val:.4f}")
 print(f"Arousal RMSE: {rmse_aro:.4f}, MAE: {mae_aro:.4f}")
+
+
