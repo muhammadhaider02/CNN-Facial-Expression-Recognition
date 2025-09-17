@@ -56,3 +56,4 @@ log/
 *.ckpt
 *.onnx
 ConfusionMatrix_*.png
+*.pkl
