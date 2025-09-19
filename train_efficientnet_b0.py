@@ -5,7 +5,9 @@ from torch.utils.data import DataLoader
 from torchvision.models import efficientnet_b0, EfficientNet_B0_Weights
 from FER_transform import FERDataset, build_transforms
 import numpy as np
-from torch.amp import autocast, GradScaler
+from torch.cuda.amp import autocast, GradScaler
+import time
+import matplotlib.pyplot as plt
 
 # 1. Config
 BATCH_SIZE = 16
@@ -80,6 +82,14 @@ ema = EMA(model)
 best_val_acc = 0.0
 bad_epochs = 0
 
+# For training graphs
+history_train_loss = []
+history_train_acc = []
+history_val_loss = []
+history_val_acc = []
+
+start_time = time.time()
+
 for epoch in range(EPOCHS):
     # --- Training ---
     model.train()
@@ -89,7 +99,7 @@ for epoch in range(EPOCHS):
         imgs, y_cls, y_reg = batch["image"].to(DEVICE), batch["y_cls"].to(DEVICE), batch["y_reg"].to(DEVICE)
         optimizer.zero_grad(set_to_none=True)
 
-        with autocast("cuda", enabled=(DEVICE.type == "cuda")):
+        with autocast(enabled=(DEVICE.type == "cuda")):
             out_cls, out_reg = model(imgs)
             loss_cls = criterion_cls(out_cls, y_cls)
             loss_reg = criterion_reg(out_reg, y_reg)
@@ -107,6 +117,10 @@ for epoch in range(EPOCHS):
 
     train_acc = 100. * correct / total
     scheduler.step()
+
+    # Track train metrics per epoch
+    history_train_loss.append(train_loss / max(len(train_dl), 1))
+    history_train_acc.append(train_acc)
 
     # --- Validation ---
     ema.apply_shadow()
@@ -126,6 +140,10 @@ for epoch in range(EPOCHS):
 
     val_acc = 100. * val_correct / val_total
 
+    # Track val metrics per epoch
+    history_val_loss.append(val_loss / max(len(val_dl), 1))
+    history_val_acc.append(val_acc)
+
     print(f"Epoch [{epoch+1}/{EPOCHS}] "
           f"Train Loss: {train_loss/len(train_dl):.4f} | Train Acc: {train_acc:.2f}% "
           f"|| Val Loss: {val_loss/len(val_dl):.4f} | Val Acc: {val_acc:.2f}%")
@@ -141,3 +159,36 @@ for epoch in range(EPOCHS):
             break
 
 print("Training complete. Best Val Acc:", best_val_acc)
+
+# Total time tracking
+elapsed = time.time() - start_time
+hhmmss = time.strftime("%H:%M:%S", time.gmtime(elapsed))
+print(f"Total training time: {hhmmss} ({elapsed:.1f}s)")
+
+# Save training graphs
+try:
+    epochs_range = range(1, len(history_train_loss) + 1)
+    fig, axes = plt.subplots(2, 1, figsize=(8, 8))
+
+    # Losses
+    axes[0].plot(epochs_range, history_train_loss, label="Train Loss")
+    axes[0].plot(epochs_range, history_val_loss, label="Val Loss")
+    axes[0].set_xlabel("Epoch")
+    axes[0].set_ylabel("Loss")
+    axes[0].set_title("Loss over epochs")
+    axes[0].legend()
+
+    # Accuracies
+    axes[1].plot(epochs_range, history_train_acc, label="Train Acc (%)")
+    axes[1].plot(epochs_range, history_val_acc, label="Val Acc (%)")
+    axes[1].set_xlabel("Epoch")
+    axes[1].set_ylabel("Accuracy (%)")
+    axes[1].set_title("Accuracy over epochs")
+    axes[1].legend()
+
+    plt.tight_layout()
+    plt.savefig("TrainingGraph_efficientnet_b0.png")
+    plt.close(fig)
+    print("Saved training graph to TrainingGraph_efficientnet_b0.png")
+except Exception as e:
+    print("Failed to save training graph:", e)

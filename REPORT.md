@@ -18,7 +18,7 @@
 - Augmentations (train): RandomResizedCrop, HorizontalFlip, mild ColorJitter, Affine (translate/scale/rotate), CoarseDropout, ISONoise, Median/Gaussian blur, CLAHE, Normalize, ToTensorV2.
 - Validation: Resize → Normalize → ToTensorV2.
 
-## Training: train_vggface2_resnet50.py
+## Training: train_resnet50.py
 
 ### Model architecture
 - Backbone: `torchvision.models.resnet50` with `fc` replaced by `Identity` to expose a pooled feature vector.
@@ -28,7 +28,7 @@
   - Regression head: `Linear(in_features, 2)` (valence, arousal).
 
 ### Initialization
-- If `--vggface2_ckpt` provided (default `weight/resnet50_vggface2.pth`): loads compatible weights into the backbone (skips `fc.*`).
+- If `--vggface2_ckpt` provided (default `weight/resnet50_ft_weight.pth`): loads compatible weights into the backbone (skips `fc.*`).
 - Otherwise uses ImageNet weights `ResNet50_Weights.IMAGENET1K_V1`.
 
 ### Freezing policy (staged fine-tuning)
@@ -64,10 +64,49 @@
 - `--lr 1e-4`
 - `--weight_decay 1e-3`
 - `--img_size 224`
-- `--vggface2_ckpt weight/resnet50_vggface2.pth`
+- `--vggface2_ckpt weight/resnet50_ft_weight.pth`
 - `--unfreeze_all_at None`
 - `--save_path FER_resnet50.pth`
 
 ### Output artifacts
 - Checkpoint: `FER_resnet50.pth` (best by validation accuracy).
 - Evaluation: `eval_resnet50.py` reports classification (Accuracy, F1, Kappa, AUC, PR‑AUC, Krippendorff’s Alpha) and regression (RMSE/MAE, Pearson CORR, SAGR, CCC) and saves `ConfusionMatrix_resnet50.png`.
+
+## Training: train_efficientnet_b0.py
+
+### Model architecture
+- Backbone: `torchvision.models.efficientnet_b0` with `classifier` replaced by `Identity` to expose features.
+- Regularization: `Dropout(p=0.3)` on features.
+- Heads (multitask):
+  - Classification head: `Linear(in_features, 8)` (8 expressions).
+  - Regression head: `Linear(in_features, 2)` (valence, arousal).
+
+### Initialization
+- ImageNet weights `EfficientNet_B0_Weights.IMAGENET1K_V1`.
+
+### Exponential Moving Average (EMA)
+- Maintains a shadow copy of trainable parameters updated each step (`decay≈0.999`).
+- Applies shadow weights for validation to stabilize metrics.
+
+### Losses
+- Classification: CrossEntropyLoss with label smoothing 0.05 and class weights (inverse frequency).
+- Regression: MSELoss.
+- Total loss: `loss = loss_cls + 0.5 * loss_reg`.
+
+### Optimization & schedule
+- Optimizer: AdamW (`LR=3e-4`, `weight_decay=1e-4`).
+- LR scheduler: CosineAnnealingLR with `T_max = EPOCHS`.
+- Mixed precision: CUDA AMP + GradScaler.
+
+### Data loading
+- Uses `FERDataset` transforms (default size 224 via file, flag not exposed here).
+- DataLoader: `batch_size=16`, `num_workers=0`.
+
+### Metrics, checkpointing, early stopping
+- Prints per-epoch train loss/acc and val loss/acc (with EMA applied).
+- Best checkpoint saved by highest validation accuracy to `FER_efficientnet_b0.pth`.
+- Early stopping with patience 10 epochs.
+
+### Output artifacts
+- Checkpoint: `FER_efficientnet_b0.pth` (best by validation accuracy).
+- Evaluation: `eval_efficientnet_b0.py` reports classification (Accuracy, F1, Kappa, AUC, PR‑AUC, Krippendorff’s Alpha) and regression (RMSE/MAE, Pearson CORR, SAGR, CCC) and saves `ConfusionMatrix_efficientnet_b0.png`.

@@ -1,4 +1,4 @@
-## Facial Emotion Recognition (FER) — Quickstart
+## Facial Emotion Recognition (FER)
 
 This repository trains and evaluates a multitask ResNet‑50 model for 8‑class emotion classification and 2‑target regression (valence, arousal).
 
@@ -48,7 +48,7 @@ python test_labels.py
 ### 4) Train (ResNet‑50, VGGFace2‑initialized)
 By default, the script looks for `weight/resnet50_vggface2.pth`. If missing, it falls back to ImageNet weights.
 ```bash
-python train_vggface2_resnet50.py \
+python train_resnet50.py \
   --train_meta metadata_train.parquet \
   --val_meta metadata_val.parquet \
   --epochs 100 \
@@ -66,7 +66,8 @@ Runs on the validation split and saves a confusion matrix.
 python eval_resnet50.py
 ```
 Outputs:
-- Prints classification metrics (accuracy, F1, AUC, etc.) and regression metrics (RMSE/MAE for valence/arousal)
+- Classification: Accuracy, Macro F1, Cohen's Kappa, ROC-AUC (macro OvR), PR-AUC (macro), Krippendorff's Alpha
+- Regression: RMSE/MAE (valence, arousal), Pearson CORR, SAGR, CCC
 - Saves `ConfusionMatrix_resnet50.png`
 
 ### Tips
@@ -76,5 +77,5 @@ Outputs:
 ### Further reading
 - See [REPORT.md](REPORT.md) for a concise description of the pipeline:
   - What `metadata_parallel.py` builds, how `FER_transform.py` prepares data
-  - Model architecture, initialization, training policy and settings in `train_vggface2_resnet50.py`
+  - Model architecture, initialization, training policy and settings in `train_resnet50.py`
 - See [RESULTS.md](RESULTS.md) for full validation metrics and confusion matrices across models.
