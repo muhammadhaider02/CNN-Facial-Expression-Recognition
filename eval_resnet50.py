@@ -118,3 +118,56 @@ mae_aro = mean_absolute_error(y_arousal, y_arousal_pred)
 
 print(f"Valence RMSE: {rmse_val:.4f}, MAE: {mae_val:.4f}")
 print(f"Arousal RMSE: {rmse_aro:.4f}, MAE: {mae_aro:.4f}")
+
+# 6. Additional required metrics
+
+def _krippendorff_alpha_nominal(y_true_arr: np.ndarray, y_pred_arr: np.ndarray) -> float:
+    # Observed disagreement: proportion of items where the two coders disagree
+    obs_disagree = np.mean(y_true_arr != y_pred_arr)
+    # Pooled category distribution across both coders
+    pooled = np.concatenate([y_true_arr, y_pred_arr])
+    values, counts = np.unique(pooled, return_counts=True)
+    p = counts.astype(float) / pooled.size
+    exp_disagree = 1.0 - np.sum(p ** 2)  # 1 - sum p_c^2
+    if exp_disagree == 0.0:
+        return 1.0 if obs_disagree == 0.0 else float("nan")
+    return 1.0 - (obs_disagree / exp_disagree)
+
+def _pearson_corr(y_true_arr: np.ndarray, y_pred_arr: np.ndarray) -> float:
+    if np.std(y_true_arr) == 0 or np.std(y_pred_arr) == 0:
+        return float("nan")
+    return float(np.corrcoef(y_true_arr, y_pred_arr)[0, 1])
+
+def _sagr(y_true_arr: np.ndarray, y_pred_arr: np.ndarray) -> float:
+    # Sign Agreement Rate: fraction where signs match; np.sign(0) == 0
+    return float(np.mean(np.sign(y_true_arr) == np.sign(y_pred_arr)))
+
+def _ccc(y_true_arr: np.ndarray, y_pred_arr: np.ndarray) -> float:
+    x = y_true_arr.astype(float)
+    y = y_pred_arr.astype(float)
+    mx, my = np.mean(x), np.mean(y)
+    vx, vy = np.var(x), np.var(y)
+    cov = np.mean((x - mx) * (y - my))
+    denom = vx + vy + (mx - my) ** 2
+    if denom == 0.0:
+        return float("nan")
+    return float((2.0 * cov) / denom)
+
+# Krippendorff's Alpha (nominal) for classification (GT vs predictions)
+alpha = _krippendorff_alpha_nominal(y_true, y_pred)
+print(f"Krippendorff's Alpha (nominal): {alpha:.4f}")
+
+# Pearson Correlation, SAGR, and CCC for valence and arousal
+val_corr = _pearson_corr(np.array(y_valence), np.array(y_valence_pred))
+aro_corr = _pearson_corr(np.array(y_arousal), np.array(y_arousal_pred))
+val_sagr = _sagr(np.array(y_valence), np.array(y_valence_pred))
+aro_sagr = _sagr(np.array(y_arousal), np.array(y_arousal_pred))
+val_ccc = _ccc(np.array(y_valence), np.array(y_valence_pred))
+aro_ccc = _ccc(np.array(y_arousal), np.array(y_arousal_pred))
+
+print(f"Valence CORR (Pearson): {val_corr:.4f}")
+print(f"Arousal CORR (Pearson): {aro_corr:.4f}")
+print(f"Valence SAGR: {val_sagr:.4f}")
+print(f"Arousal SAGR: {aro_sagr:.4f}")
+print(f"Valence CCC: {val_ccc:.4f}")
+print(f"Arousal CCC: {aro_ccc:.4f}")

@@ -35,6 +35,10 @@ weighted avg     0.5007    0.5012    0.4999       800
 - PR-AUC (macro): **0.4871**
 - Valence RMSE: **0.3867**, MAE: **0.2982**
 - Arousal RMSE: **0.3283**, MAE: **0.2562**
+- Krippendorff's Alpha: **0.4298**
+- Valence CORR: **0.5805** | Arousal CORR: **0.5025**
+- Valence SAGR: **0.7562** | Arousal SAGR: **0.8025**
+- Valence CCC: **0.5486** | Arousal CCC: **0.4581**
 
 ## ResNet34 Results
 
@@ -62,6 +66,10 @@ weighted avg     0.4775    0.4825    0.4692       800
 - Macro F1-score: **0.4692**
 - Valence RMSE: **0.3885**, MAE: **0.3085**
 - Arousal RMSE: **0.3341**, MAE: **0.2702**
+- Krippendorff's Alpha: **0.4066**
+- Valence CORR: **0.5681** | Arousal CORR: **0.4783**
+- Valence SAGR: **0.7588** | Arousal SAGR: **0.7963**
+- Valence CCC: **0.5193** | Arousal CCC: **0.3713**
 
 ## EfficientNet-B0 Results
 
@@ -89,6 +97,10 @@ weighted avg     0.4952    0.4863    0.4837       800
 - Macro F1-score: **0.4837**
 - Valence RMSE: **0.3962**, MAE: **0.3147**
 - Arousal RMSE: **0.3487**, MAE: **0.2762**
+- Krippendorff's Alpha: **0.4116**
+- Valence CORR: **0.5693** | Arousal CORR: **0.4674**
+- Valence SAGR: **0.7475** | Arousal SAGR: **0.7937**
+- Valence CCC: **0.5403** | Arousal CCC: **0.4322**
 
 ## ResNet50 Results
 
@@ -119,6 +131,10 @@ weighted avg     0.5448    0.5288    0.5239       800
 - PR-AUC (macro): **0.5706**
 - Valence RMSE: **0.3732**, MAE: **0.2911**
 - Arousal RMSE: **0.3189**, MAE: **0.2567**
+- Krippendorff's Alpha: **0.4596**
+- Valence CORR: **0.6362** | Arousal CORR: **0.5491**
+- Valence SAGR: **0.7863** | Arousal SAGR: **0.7925**
+- Valence CCC: **0.5853** | Arousal CCC: **0.4704**
 
 ## Models Comparison
 
