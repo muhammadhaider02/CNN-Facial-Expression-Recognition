@@ -120,36 +120,6 @@ weighted avg     0.5448    0.5288    0.5239       800
 - Valence RMSE: **0.3732**, MAE: **0.2911**
 - Arousal RMSE: **0.3189**, MAE: **0.2567**
 
-## SENet50 Results
-
-### Classification Performance
-
-```
-              precision    recall  f1-score   support
-
-     Neutral     0.3889    0.2800    0.3256       100
-       Happy     0.6923    0.6300    0.6597       100
-         Sad     0.4336    0.6200    0.5103       100
-    Surprise     0.6500    0.5200    0.5778       100
-        Fear     0.6250    0.5000    0.5556       100
-     Disgust     0.4955    0.5500    0.5213       100
-       Anger     0.4077    0.5300    0.4609       100
-    Contempt     0.5161    0.4800    0.4974       100
-
-    accuracy                         0.5138       800
-   macro avg     0.5261    0.5138    0.5136       800
-weighted avg     0.5261    0.5138    0.5136       800
-```
-
-### Summary Metrics
-- Overall Accuracy: **0.5138**
-- Macro F1-score: **0.5136**
-- Cohen's Kappa: **0.4443**
-- ROC-AUC (macro): **0.8704**
-- PR-AUC (macro): **0.5390**
-- Valence RMSE: **0.3730**, MAE: **0.2898**
-- Arousal RMSE: **0.3299**, MAE: **0.2662**
-
 ## Models Comparison
 
 | Model | Accuracy | F1-score | Valence RMSE | Arousal RMSE |
@@ -158,6 +128,5 @@ weighted avg     0.5261    0.5138    0.5136       800
 | ResNet34 | 0.4825 | 0.4692 | 0.3885 | 0.3341 |
 | EfficientNet-B0 | 0.4863 | 0.4837 | 0.3962 | 0.3487 |
 | ResNet50 | 0.5288 | 0.5239 | 0.3732 | 0.3189 |
-| SENet50 | 0.5138 | 0.5136 | 0.3730 | 0.3299 |
 
-ResNet50 shows the best overall classification performance with the highest accuracy (0.5288) and F1-score (0.5239). For regression, SENet50 attains the lowest Valence RMSE (0.3730) while ResNet50 achieves the lowest Arousal RMSE (0.3189).
+ResNet50 shows the best overall classification performance with the highest accuracy (0.5288) and F1-score (0.5239). For regression, ResNet50 achieves the lowest Valence RMSE (0.3732) and the lowest Arousal RMSE (0.3189) among the compared models.

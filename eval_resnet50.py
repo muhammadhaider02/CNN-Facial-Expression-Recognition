@@ -118,5 +118,3 @@ mae_aro = mean_absolute_error(y_arousal, y_arousal_pred)
 
 print(f"Valence RMSE: {rmse_val:.4f}, MAE: {mae_val:.4f}")
 print(f"Arousal RMSE: {rmse_aro:.4f}, MAE: {mae_aro:.4f}")
-
-

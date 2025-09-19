@@ -8,6 +8,8 @@ __pycache__/
 
 images_aug/
 annotations_aug/
+weight/
+senet.pytorch/
 
 # Python caches and build artifacts
 .pytest_cache/
@@ -51,9 +53,7 @@ models/
 logs/
 log/
 *.log
-*.pth
 *.pt
 *.ckpt
 *.onnx
-ConfusionMatrix_*.png
 *.pkl
