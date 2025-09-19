@@ -46,29 +46,29 @@ python test_labels.py
 ```
 
 ### 4) Train (ResNet‑50, VGGFace2‑initialized)
-By default, the script looks for `weight/resnet50_vggface2.pth`. If missing, it falls back to ImageNet weights.
+By default, the script looks for `weight/resnet50_ft_weight.pth`. If missing, it falls back to ImageNet weights.
 ```bash
-python train_resnet50.py \
+python train_vggface2_resnet50.py \
   --train_meta metadata_train.parquet \
   --val_meta metadata_val.parquet \
   --epochs 100 \
   --batch_size 8 \
   --img_size 224 \
-  --save_path FER_resnet50.pth
+  --save_path FER_vggface2_resnet50.pth
 ```
 Useful flags (see script for all): `--lr`, `--weight_decay`, `--freeze_epochs`, `--unfreeze_all_at`, `--vggface2_ckpt`.
 
-Outputs: best checkpoint saved to `FER_resnet50.pth` (by validation accuracy).
+Outputs: best checkpoint saved to `FER_vggface2_resnet50.pth` (by validation accuracy).
 
 ### 5) Evaluate
 Runs on the validation split and saves a confusion matrix.
 ```bash
-python eval_resnet50.py
+python eval_vggface2_resnet50.py
 ```
 Outputs:
 - Classification: Accuracy, Macro F1, Cohen's Kappa, ROC-AUC (macro OvR), PR-AUC (macro), Krippendorff's Alpha
 - Regression: RMSE/MAE (valence, arousal), Pearson CORR, SAGR, CCC
-- Saves `ConfusionMatrix_resnet50.png`
+- Saves `ConfusionMatrix_vggface2_resnet50.png`
 
 ### Tips
 - If you hit CUDA OOM, reduce `--batch_size` or `--img_size`.
@@ -77,5 +77,5 @@ Outputs:
 ### Further reading
 - See [REPORT.md](REPORT.md) for a concise description of the pipeline:
   - What `metadata_parallel.py` builds, how `FER_transform.py` prepares data
-  - Model architecture, initialization, training policy and settings in `train_resnet50.py`
+  - Model architecture, initialization, training policy and settings in `train_vggface2_resnet50.py`
 - See [RESULTS.md](RESULTS.md) for full validation metrics and confusion matrices across models.

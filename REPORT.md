@@ -18,7 +18,7 @@
 - Augmentations (train): RandomResizedCrop, HorizontalFlip, mild ColorJitter, Affine (translate/scale/rotate), CoarseDropout, ISONoise, Median/Gaussian blur, CLAHE, Normalize, ToTensorV2.
 - Validation: Resize → Normalize → ToTensorV2.
 
-## Training: train_resnet50.py
+## Training: train_vggface2_resnet50.py
 
 ### Model architecture
 - Backbone: `torchvision.models.resnet50` with `fc` replaced by `Identity` to expose a pooled feature vector.
@@ -52,7 +52,7 @@
 
 ### Metrics, checkpointing, early stopping
 - Training prints per-epoch train loss/acc and val loss/acc/RMSE.
-- Best model is selected by highest validation accuracy and saved to `--save_path` (default `FER_resnet50.pth`).
+- Best model is selected by highest validation accuracy and saved to `--save_path` (default `FER_vggface2_resnet50.pth`).
 - Early stopping with patience 15 epochs: resets on improvement of either validation accuracy or regression RMSE; stops when neither improves for `patience` epochs.
 
 ### Key CLI arguments (defaults)
@@ -66,11 +66,11 @@
 - `--img_size 224`
 - `--vggface2_ckpt weight/resnet50_ft_weight.pth`
 - `--unfreeze_all_at None`
-- `--save_path FER_resnet50.pth`
+- `--save_path FER_vggface2_resnet50.pth`
 
 ### Output artifacts
-- Checkpoint: `FER_resnet50.pth` (best by validation accuracy).
-- Evaluation: `eval_resnet50.py` reports classification (Accuracy, F1, Kappa, AUC, PR‑AUC, Krippendorff’s Alpha) and regression (RMSE/MAE, Pearson CORR, SAGR, CCC) and saves `ConfusionMatrix_resnet50.png`.
+- Checkpoint: `FER_vggface2_resnet50.pth` (best by validation accuracy).
+- Evaluation: `eval_vggface2_resnet50.py` reports classification (Accuracy, F1, Kappa, AUC, PR‑AUC, Krippendorff’s Alpha) and regression (RMSE/MAE, Pearson CORR, SAGR, CCC) and saves `ConfusionMatrix_vggface2_resnet50.png`.
 
 ## Training: train_efficientnet_b0.py
 
