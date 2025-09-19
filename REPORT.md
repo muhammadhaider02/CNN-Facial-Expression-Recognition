@@ -28,7 +28,13 @@
   - Regression head: `Linear(in_features, 2)` (valence, arousal).
 
 ### Initialization
-- If `--vggface2_ckpt` provided (default `weight/resnet50_ft_weight.pth`): loads compatible weights into the backbone (skips `fc.*`).
+- If `--vggface2_ckpt` provided (default `weight/resnet50_ft_weight.pth`):
+  - Filters out `fc.*` and any shape-mismatched keys from the checkpoint, then performs a non-strict load into the ResNet50 backbone.
+  - Prints only three lines for clarity:
+    - `[VGGFace2] Backbone param coverage: X/Y (Z%)`
+    - `[VGGFace2] Non-strict load completed.`
+    - `[ImageNet] Remaining Backbone params coverage: A/B (C%)`
+  - Overlays ImageNet weights (`ResNet50_Weights.IMAGENET1K_V1`) for any remaining compatible backbone parameters not covered by VGGFace2.
 - Otherwise uses ImageNet weights `ResNet50_Weights.IMAGENET1K_V1`.
 
 ### Freezing policy (staged fine-tuning)

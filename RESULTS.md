@@ -39,6 +39,7 @@ weighted avg     0.5007    0.5012    0.4999       800
 - Valence CORR: **0.5805** | Arousal CORR: **0.5025**
 - Valence SAGR: **0.7562** | Arousal SAGR: **0.8025**
 - Valence CCC: **0.5486** | Arousal CCC: **0.4581**
+- Confusion Matrix [Confusion Matrix](ConfusionMatrix_resnet18.png)
 
 ## ResNet34 Results
 
@@ -70,6 +71,7 @@ weighted avg     0.5017    0.4850    0.4844       800
 - Valence CORR: **0.5000** | Arousal CORR: **0.4916**
 - Valence SAGR: **0.7488** | Arousal SAGR: **0.7825**
 - Valence CCC: **0.4059** | Arousal CCC: **0.3557**
+- Confusion Matrix [Confusion Matrix](ConfusionMatrix_resnet34.png)
 
 ## EfficientNet-B0 Results
 
@@ -101,6 +103,7 @@ weighted avg     0.4985    0.4950    0.4948       800
 - Valence CORR: **0.5917** | Arousal CORR: **0.4922**
 - Valence SAGR: **0.7438** | Arousal SAGR: **0.8075**
 - Valence CCC: **0.5605** | Arousal CCC: **0.4558**
+- Confusion Matrix [Confusion Matrix](ConfusionMatrix_efficientnet_b0.png)
 
 ## ResNet50 Results
 
@@ -135,6 +138,7 @@ weighted avg     0.5448    0.5288    0.5239       800
 - Valence CORR: **0.6362** | Arousal CORR: **0.5491**
 - Valence SAGR: **0.7863** | Arousal SAGR: **0.7925**
 - Valence CCC: **0.5853** | Arousal CCC: **0.4704**
+- Confusion Matrix [Confusion Matrix](ConfusionMatrix_vggface2_resnet50.png)
 
 ## Models Comparison
 
